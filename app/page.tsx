@@ -33,7 +33,7 @@ export default function Home() {
          这个 ID 在您的 Tally 链接里能找到，比如 tally.so/r/3xjo9e，ID 就是 3xjo9e
       */}
       <button
-        data-tally-open="A72vJe"  // ⚠️ 记得把这里换成您自己的 Tally ID
+        data-tally-open="rjaP9X"  // ⚠️ 记得把这里换成您自己的 Tally ID
         data-tally-layout="modal"
         data-tally-emoji-text="👋"
         data-tally-emoji-animation="wave"
