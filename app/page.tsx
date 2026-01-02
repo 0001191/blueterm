@@ -1,83 +1,47 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-// 1. 初始化 Supabase 客户端 (自动读取 .env.local 里的钥匙)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { useEffect } from 'react';
 
 export default function Home() {
-  const [snippets, setSnippets] = useState<any[]>([]);
-  const [title, setTitle] = useState('');
-  const [code, setCode] = useState('');
-
-  // 2. 加载数据：页面一打开，就去 Supabase 查表
+  
+  // 1. 加载 Tally 的脚本
   useEffect(() => {
-    fetchSnippets();
+    // 这是一个标准动作，用来加载外部脚本
+    const script = document.createElement('script');
+    script.src = "https://tally.so/widgets/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
-  async function fetchSnippets() {
-    const { data } = await supabase.from('snippets').select('*').order('created_at', { ascending: false });
-    if (data) setSnippets(data);
-  }
-
-  // 3. 提交数据：点击按钮，把数据存进 Supabase
-  async function handleSubmit() {
-    if (!title || !code) return alert('请填写完整！');
-    
-    const { error } = await supabase.from('snippets').insert([{ title, code }]);
-    
-    if (error) {
-      console.error(error);
-      alert('保存失败，请检查控制台');
-    } else {
-      setTitle(''); // 清空输入框
-      setCode('');
-      fetchSnippets(); // 刷新列表
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-blue-400">BlueTerm Snippets</h1>
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+      
+      {/* 您的产品文案 */}
+      <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+        BlueTerm
+      </h1>
+      <p className="text-xl text-gray-400 mb-8 max-w-lg text-center">
+        The Digital Twin for Developers. <br/>
+        Train an AI with your code snippets to answer questions in your style.
+      </p>
 
-        {/* --- 输入区域 --- */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
-          <input
-            className="w-full bg-gray-900 text-white p-3 rounded mb-4 border border-gray-600 focus:outline-none focus:border-blue-500"
-            placeholder="给代码起个标题 (例如: Git 常用命令)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <textarea
-            className="w-full bg-gray-900 text-white p-3 rounded mb-4 border border-gray-600 font-mono h-32 focus:outline-none focus:border-blue-500"
-            placeholder="粘贴代码在这里..."
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition"
-          >
-            保存到云端
-          </button>
-        </div>
+      {/* 关键按钮：
+         data-tally-open="您的FormID" 
+         这个 ID 在您的 Tally 链接里能找到，比如 tally.so/r/3xjo9e，ID 就是 3xjo9e
+      */}
+      <button
+        data-tally-open="A72vJe"  // ⚠️ 记得把这里换成您自己的 Tally ID
+        data-tally-layout="modal"
+        data-tally-emoji-text="👋"
+        data-tally-emoji-animation="wave"
+        className="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition transform hover:scale-105"
+      >
+        Get Early Access
+      </button>
 
-        {/* --- 展示区域 --- */}
-        <div className="space-y-4">
-          {snippets.map((item) => (
-            <div key={item.id} className="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
-              <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-              <pre className="bg-black p-3 rounded text-sm text-gray-300 overflow-x-auto">
-                <code>{item.code}</code>
-              </pre>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
